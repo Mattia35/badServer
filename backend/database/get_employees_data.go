@@ -1,18 +1,20 @@
 package database
+
 import (
 	"database/sql"
 	"errors"
+
 	structions "github.com/Mattia35/badServer/backend/api/structs"
 )
 
 func GetEmployeesData(db *sql.DB, name_and_surname string) ([]structions.Employee, error) {
 	Employees := []structions.Employee{}
 	// Ottieni i dati dell'impiegato
-	query := `SELECT name_surname, email, phone, department, position, project FROM employee WHERE name_surname = '` + name_and_surname + `'`
+	query := `SELECT name_surname, email, phone, department, position, project FROM employee WHERE name_surname LIKE '` + name_and_surname + `%'`
 	rows, err := db.Query(query)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.New("Nessun impiegato trovato con questo nome")
+			return nil, errors.New("nessun impiegato trovato con questo nome")
 		}
 		return nil, err
 	}
@@ -20,7 +22,7 @@ func GetEmployeesData(db *sql.DB, name_and_surname string) ([]structions.Employe
 
 	for rows.Next() {
 		var employee structions.Employee
-		err := rows.Scan(&employee.NameSurname, &employee.Email, &employee.Phone, &employee.Position, &employee.Project)
+		err := rows.Scan(&employee.NameSurname, &employee.Email, &employee.Phone, &employee.Department, &employee.Position, &employee.Project)
 		if err != nil {
 			return nil, err
 		}

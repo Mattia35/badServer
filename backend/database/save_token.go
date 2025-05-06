@@ -1,4 +1,5 @@
 package database
+
 import (
 	"database/sql"
 	"errors"
@@ -35,6 +36,6 @@ func SaveToken(db *sql.DB, username string, token string) (int, error) {
 
 	// Inserisce il token nel database, associandolo all'username e alla sessione
 	query2 := `INSERT INTO token (username, token, session) VALUES ('` + username + `', '` + token + `', ` + strconv.Itoa(maxSession) + `)`
-	_,err = db.Exec(query2)
+	_, err = db.Exec(query2)
 	return maxSession, err
 }

@@ -1,11 +1,12 @@
 package api
 
-import(
-	"net/http"
+import (
 	"database/sql"
-	database "github.com/Mattia35/badServer/backend/database"
-	"github.com/Mattia35/badServer/backend/api/requestContext"
 	"encoding/json"
+	"net/http"
+
+	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
+	database "github.com/Mattia35/badServer/backend/database"
 )
 
 // Handler API per l'ottenimento dei dati degli impiegati
@@ -23,7 +24,7 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 	token := ctx.Token
 
 	// Controlla che la sessione sia valida
-	control,err := database.CheckSession(db, session, token)
+	control, err := database.CheckSession(db, session, token)
 	if err != nil {
 		http.Error(w, "Internal server error: isn't possible to check session", http.StatusInternalServerError)
 		return
@@ -49,7 +50,7 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 
 	// Imposta l'intestazione della risposta come JSON
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	// Scrivi i dati degli impiegati nella risposta
 	if err := json.NewEncoder(w).Encode(employees); err != nil {
 		http.Error(w, "Internal server error: isn't possible to encode employees data", http.StatusInternalServerError)

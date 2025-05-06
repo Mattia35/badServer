@@ -1,46 +1,46 @@
 package main
 
 import (
-    "database/sql"
-    "fmt"
-    "log"
-    "net/http"
-	_ "github.com/mattn/go-sqlite3"
-	api "github.com/Mattia35/badServer/backend/api"
-	"github.com/Mattia35/badServer/backend/api/requestContext"
-	"github.com/gofrs/uuid"
-	"github.com/sirupsen/logrus"
+	"database/sql"
+	"fmt"
+	"log"
+	"net/http"
 	"strconv"
+
+	api "github.com/Mattia35/badServer/backend/api"
+	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
+	"github.com/gofrs/uuid"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/sirupsen/logrus"
 )
 
-
 var db *sql.DB
-func main() {
-    // 1. Inizializza database e crea tabelle
-    initDB()
-    // 2. Configura rotte
-    setupRoutes()
-    // 3. Avvia server
-    startServer()
-}
 
+func main() {
+	// 1. Inizializza database e crea tabelle
+	initDB()
+	// 2. Configura rotte
+	setupRoutes()
+	// 3. Avvia server
+	startServer()
+}
 
 // Inizializza la connessione al database e crea tabelle
 func initDB() {
-    var err error
-    db, err = sql.Open("sqlite3", "./app.db")
-    if err != nil {
-        log.Fatal("Errore apertura database:", err)
-    }
+	var err error
+	db, err = sql.Open("sqlite3", "./app.db")
+	if err != nil {
+		log.Fatal("Errore apertura database:", err)
+	}
 
-    // Crea le tabelle se non esistono
-    createTables()
+	// Crea le tabelle se non esistono
+	createTables()
 }
 
 // Crea le tabelle necessarie
 func createTables() {
-    queries := []string{
-        `CREATE TABLE IF NOT EXISTS employee (
+	queries := []string{
+		`CREATE TABLE IF NOT EXISTS employee (
             id INTEGER NOT NULL,
             name_surname TEXT NOT NULL,
 			email TEXT NOT NULL UNIQUE,
@@ -57,7 +57,7 @@ func createTables() {
 			FOREIGN KEY (department) REFERENCES department(id)
         );`,
 
-        `CREATE TABLE IF NOT EXISTS department (
+		`CREATE TABLE IF NOT EXISTS department (
             id INTEGER NOT NULL,
 			name TEXT NOT NULL,
 			manager INTEGER,
@@ -91,26 +91,23 @@ func createTables() {
 			FOREIGN KEY (username) REFERENCES profile(username)
 				ON DELETE CASCADE
 		);`,
-    }
+	}
 
-
-    for _, query := range queries {
-        _, err := db.Exec(query)
-        if err != nil {
-            log.Fatal("Errore creazione tabella:", err)
-        }
-    }
+	for _, query := range queries {
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Fatal("Errore creazione tabella:", err)
+		}
+	}
 }
-
 
 // Configura tutte le rotte
 func setupRoutes() {
-    // Serve frontend statico
-    fs := http.FileServer(http.Dir("./frontend"))
-    http.Handle("/", fs)
+	// Serve frontend statico
+	fs := http.FileServer(http.Dir("./frontend"))
+	http.Handle("/", fs)
 
-
-    // API endpoint
+	// API endpoint
 	// login
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		api.LoginHandler(db, w, r)
@@ -119,12 +116,11 @@ func setupRoutes() {
 	http.HandleFunc("/:profile/employees", WithRequestContext(api.GetEmployeesData))
 }
 
-
 // Avvia il server HTTP
 func startServer() {
-    addr := "localhost:8080"
-    fmt.Println("Server avviato su", addr)
-    log.Fatal(http.ListenAndServe(addr, nil))
+	addr := "localhost:8080"
+	fmt.Println("Server avviato su", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
 func WithRequestContext(handler func(*sql.DB, http.ResponseWriter, *http.Request, reqcontext.RequestContext)) http.HandlerFunc {
@@ -164,5 +160,3 @@ func WithRequestContext(handler func(*sql.DB, http.ResponseWriter, *http.Request
 		handler(db, w, r, ctx)
 	}
 }
-
-

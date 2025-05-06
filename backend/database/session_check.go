@@ -1,13 +1,14 @@
 package database
+
 import (
 	"database/sql"
-    "strconv"
-    "errors"
+	"errors"
+	"strconv"
 )
 
 func CheckSession(db *sql.DB, session int, token string) (bool, error) {
-    var session_check int
-    var query = `SELECT session FROM token WHERE session = '` + strconv.Itoa(session) + `' AND token = '` + token + `'`
+	var session_check int
+	var query = `SELECT session FROM token WHERE session = '` + strconv.Itoa(session) + `' AND token = '` + token + `'`
 
 	err := db.QueryRow(query).Scan(&session_check)
 	if err != nil {

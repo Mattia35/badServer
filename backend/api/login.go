@@ -1,18 +1,19 @@
 package api
 
-import(
-	"net/http"
-	"encoding/json"
-	"database/sql"
-	database "github.com/Mattia35/badServer/backend/database"
+import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
+	"encoding/json"
+	"net/http"
+
+	database "github.com/Mattia35/badServer/backend/database"
 )
 
 // Handler API per il login
 func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
-    // struct per la richiesta di login
+	// struct per la richiesta di login
 	type LoginRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -40,12 +41,12 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	
+
 	// Struct risposta
 	type AuthUser struct {
 		Username string `json:"username"`
-		Token   string `json:"token"`
-		Session int `json:"session"`
+		Token    string `json:"token"`
+		Session  int    `json:"session"`
 	}
 
 	// Crea un token di autorizzazione
@@ -56,7 +57,7 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Salva nel db il token generato
-	session,err := database.SaveToken(db, loginRequest.Username, token)
+	session, err := database.SaveToken(db, loginRequest.Username, token)
 	if err != nil {
 		http.Error(w, "Internal server error: isn't possible to save the token", http.StatusInternalServerError)
 		return
@@ -84,7 +85,7 @@ func GenerateSecureToken(length int) (string, error) {
 	// Riempi i byte con dati casuali sicuri (da crypto/rand)
 	_, err := rand.Read(bytes)
 
-	// Se c'è un errore, lo restituisce    
+	// Se c'è un errore, lo restituisce
 	if err != nil {
 		return "", err
 	}
@@ -92,4 +93,3 @@ func GenerateSecureToken(length int) (string, error) {
 	// Converte i byte casuali in una stringa in formato Base64 URL-safe
 	return base64.RawURLEncoding.EncodeToString(bytes), nil
 }
-
