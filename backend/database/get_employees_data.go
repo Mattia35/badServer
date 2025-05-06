@@ -2,18 +2,33 @@ package database
 import (
 	"database/sql"
 	"errors"
+	structions "github.com/Mattia35/badServer/backend/api/structs"
 )
 
-func GetEmployeesData(db *sql.DB) (string, error) {
+func GetEmployeesData(db *sql.DB, name_and_surname string) ([]structions.Employee, error) {
+	Employees := []structions.Employee{}
 	// Ottieni i dati dell'impiegato
-	query := `SELECT id, name, surname, email, phone, department FROM employees`
-	var employeeData string
-	err := db.QueryRow(query).Scan(&employeeData)
+	query := `SELECT name_surname, email, phone, department, position, project FROM employee WHERE name_surname = '` + name_and_surname + `'`
+	rows, err := db.Query(query)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", errors.New("Nessun impiegato trovato con questo ID")
+			return nil, errors.New("Nessun impiegato trovato con questo nome")
 		}
-		return "", err
+		return nil, err
 	}
-	return employeeData, nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var employee structions.Employee
+		err := rows.Scan(&employee.NameSurname, &employee.Email, &employee.Phone, &employee.Position, &employee.Project)
+		if err != nil {
+			return nil, err
+		}
+		Employees = append(Employees, employee)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return Employees, nil
 }

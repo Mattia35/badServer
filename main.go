@@ -42,8 +42,7 @@ func createTables() {
     queries := []string{
         `CREATE TABLE IF NOT EXISTS employee (
             id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            surname TEXT NOT NULL,
+            name_surname TEXT NOT NULL,
 			email TEXT NOT NULL UNIQUE,
 			phone TEXT NOT NULL UNIQUE,
 			address TEXT NOT NULL,
@@ -81,7 +80,7 @@ func createTables() {
 		`CREATE TABLE IF NOT EXISTS profile (
 			username TEXT NOT NULL,
 			password TEXT NOT NULL,
-			PRIMARY KEY (username, password)
+			PRIMARY KEY (username)
 		);`,
 
 		`CREATE TABLE IF NOT EXISTS token (
