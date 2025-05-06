@@ -55,16 +55,16 @@ func searchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 
 	type TotalProj struct {
 		Project []structions.Project `json:"project"`
-		Users string `json:"users"`
+		Employee string `json:"employee"`
 	}
 	var response TotalProj
 	response.Project = listProject
 	// per ogni progetto ottiene l'elenco di utenti che ne fanno parte
 	for i := 0; i < len(listProject); i++ {
 		// ottieni i dati degli utenti che fanno parte del progetto
-		response.Users, err = database.GetEmplByProj(db, listProject[i].ID)
+		response.Employee, err = database.GetEmplByProj(db, listProject[i].ID)
 		if err != nil {
-			http.Error(w, "Internal server error: isn't possible to get users from project", http.StatusInternalServerError)
+			http.Error(w, "Internal server error: isn't possible to get employee from project", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -72,7 +72,7 @@ func searchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	// Imposta l'intestazione della risposta come JSON
 	w.Header().Set("Content-Type", "application/json")
 
-	// Scrivi i dati degli impiegati nella risposta
+	// Scrivi la lista dei progetti nella risposta
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Internal server error: isn't possible to encode list of project", http.StatusInternalServerError)
 		return
