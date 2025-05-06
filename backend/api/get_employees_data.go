@@ -28,13 +28,20 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 		http.Error(w, "Internal server error: isn't possible to check session", http.StatusInternalServerError)
 		return
 	}
-	if control == false {
+	if !control {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
+	// Get the search query
+	query := r.URL.Query().Get("query")
+	if query == "" {
+		http.Error(w, "Bad request: isn't possible to get the input", http.StatusInternalServerError)
+		return
+	}
+
 	// Ottieni i dati degli impiegati dal database
-	employees, err := database.GetEmployeesData(db)
+	employees, err := database.GetEmployeesData(db, query)
 	if err != nil {
 		http.Error(w, "Internal server error: isn't possible to get employees data", http.StatusInternalServerError)
 		return
