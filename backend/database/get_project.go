@@ -8,7 +8,7 @@ import(
 func GetProject(db *sql.DB, name string) ([]structions.Project, error) {
 	// Ottieni i dati del progetto dal database
 	var listProject []structions.Project
-	rows, err := db.Query("SELECT id, name, start_date end_date, department FROM project WHERE name = ?", "%"+name+"%")
+	rows, err := db.Query(`SELECT id, name, start_date end_date, department FROM project WHERE name LIKE '`+name+`%'`)
 	if err != nil {
 		return nil, err
 	}
