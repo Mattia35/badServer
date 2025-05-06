@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/julienschmidt/httprouter"
+
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
 	structions "github.com/Mattia35/badServer/backend/api/structs"
 	database "github.com/Mattia35/badServer/backend/database"
 )
 
-func searchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext) {
+func searchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
 
 	// Ottieni la sessione dell'utente
 	session := ctx.Session
@@ -54,8 +56,8 @@ func searchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	}
 
 	type TotalProj struct {
-		Project []structions.Project `json:"project"`
-		Employee string `json:"employee"`
+		Project  []structions.Project `json:"project"`
+		Employee string               `json:"employee"`
 	}
 	var response TotalProj
 	response.Project = listProject

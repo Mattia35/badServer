@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
+
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
 	database "github.com/Mattia35/badServer/backend/database"
 )
 
 // Handler API per l'ottenimento dei dati degli impiegati
-func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext) {
+func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
 	// Ottieni la sessione dell'utente
 	session := ctx.Session
 

@@ -10,6 +10,7 @@ import (
 	api "github.com/Mattia35/badServer/backend/api"
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
 	"github.com/gofrs/uuid"
+	"github.com/julienschmidt/httprouter"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 )
@@ -17,12 +18,10 @@ import (
 var db *sql.DB
 
 func main() {
-	// 1. Inizializza database e crea tabelle
 	initDB()
-	// 2. Configura rotte
-	setupRoutes()
-	// 3. Avvia server
-	startServer()
+	defer db.Close()
+	router := setupRoutes()
+	startServer(router)
 }
 
 // Inizializza la connessione al database e crea tabelle
@@ -101,45 +100,44 @@ func createTables() {
 	}
 }
 
-// Configura tutte le rotte
-func setupRoutes() {
-	// Serve frontend statico
-	fs := http.FileServer(http.Dir("./frontend"))
-	http.Handle("/", fs)
+func setupRoutes() *httprouter.Router {
+	router := httprouter.New()
 
-	// API endpoint
-	// login
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		api.LoginHandler(db, w, r)
+	// Serve il frontend statico
+	router.ServeFiles("/*filepath", http.Dir("./frontend"))
+
+	// Login
+	router.POST("/login", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		api.LoginHandler(db, w, r, ps)
 	})
-	// get employees data
-	http.HandleFunc("/:profile/employees", WithRequestContext(api.GetEmployeesData))
+
+	// Employees data
+	router.GET("/:profile/employees", WithRequestContext(api.GetEmployeesData))
+
+	return router
 }
 
 // Avvia il server HTTP
-func startServer() {
+func startServer(router *httprouter.Router) {
 	addr := "localhost:8080"
 	fmt.Println("Server avviato su", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Fatal(http.ListenAndServe(addr, router))
 }
 
-func WithRequestContext(handler func(*sql.DB, http.ResponseWriter, *http.Request, reqcontext.RequestContext)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func WithRequestContext(
+	handler func(*sql.DB, http.ResponseWriter, *http.Request, reqcontext.RequestContext, httprouter.Params),
+) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		reqID, _ := uuid.NewV4()
 
-		// Estrai il token dall'header Authorization
+		// Estrai token e sessione
 		token := r.Header.Get("Authorization")
-
-		// Estrai la sessione da un header (es: "X-Session")
 		sessionStr := r.Header.Get("X-Session")
 		session := 0
-		if sessionStr != "" {
-			if parsedSession, err := strconv.Atoi(sessionStr); err == nil {
-				session = parsedSession
-			}
+		if parsedSession, err := strconv.Atoi(sessionStr); err == nil {
+			session = parsedSession
 		}
 
-		// Costruisci il logger
 		logger := logrus.WithField("req_id", reqID.String())
 		if token != "" {
 			logger = logger.WithField("token", token)
@@ -148,7 +146,6 @@ func WithRequestContext(handler func(*sql.DB, http.ResponseWriter, *http.Request
 			logger = logger.WithField("session", session)
 		}
 
-		// Crea il contesto
 		ctx := reqcontext.RequestContext{
 			ReqUUID: reqID,
 			Token:   token,
@@ -156,7 +153,6 @@ func WithRequestContext(handler func(*sql.DB, http.ResponseWriter, *http.Request
 			Logger:  logger,
 		}
 
-		// Esegui l'handler
-		handler(db, w, r, ctx)
+		handler(db, w, r, ctx, ps)
 	}
 }

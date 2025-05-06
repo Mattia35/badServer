@@ -7,11 +7,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
+
 	database "github.com/Mattia35/badServer/backend/database"
 )
 
 // Handler API per il login
-func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// struct per la richiesta di login
 	type LoginRequest struct {

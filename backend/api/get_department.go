@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
+
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
 	database "github.com/Mattia35/badServer/backend/database"
 )
 
-func GetDepartment(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext) {
+func GetDepartment(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
 	// Ottieni la sessione dell'utente
 	session := ctx.Session
 
