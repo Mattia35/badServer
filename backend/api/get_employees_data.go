@@ -46,7 +46,7 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 	// Ottieni i dati degli impiegati dal database
 	employees, err := database.GetEmployeesData(db, query)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to get employees data", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to get employees data"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

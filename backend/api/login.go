@@ -39,7 +39,7 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprou
 		if err == sql.ErrNoRows {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		} else {
-			http.Error(w, "Internal server error: isn't possibile to check credentials", http.StatusInternalServerError)
+			http.Error(w, "Internal server error: isn't possibile to check credentials: "+ err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}

@@ -28,7 +28,7 @@ func SaveToken(db *sql.DB, username string, token string) (int, error) {
 		}
 
 		if !_maxSession.Valid {
-			maxSession = 0
+			maxSession = 1
 		} else {
 			maxSession = int(_maxSession.Int64)
 		}

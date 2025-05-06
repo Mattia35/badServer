@@ -10,7 +10,7 @@ func CheckCredentials(db *sql.DB, username string, password string) error {
 	// Controlla se le credenziali sono valide
 	query := `SELECT username, password FROM profile WHERE username = '` + username + `' AND password = '` + password + `'`
 	var profile structions.Profile
-	err := db.QueryRow(query).Scan(profile.Username, profile.Password)
+	err := db.QueryRow(query).Scan(&profile.Username, &profile.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return err

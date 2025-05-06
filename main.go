@@ -104,24 +104,24 @@ func setupRoutes() *httprouter.Router {
 	router := httprouter.New()
 
 	// Serve il frontend statico
-	router.ServeFiles("/*filepath", http.Dir("./frontend"))
+	router.ServeFiles("/static/*filepath", http.Dir("./frontend"))
 
 	// Login
-	router.POST("/login", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	router.PUT("/login", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		api.LoginHandler(db, w, r, ps)
 	})
 
 	// Employees data
-	router.GET("/:profile/employees", WithRequestContext(api.GetEmployeesData))
+	router.GET("/profiles/:profile/employees", WithRequestContext(api.GetEmployeesData))
 
 	// Search project
-	router.GET("/:profile/projects", WithRequestContext(api.SearchProject))
+	router.GET("/profiles/:profile/projects", WithRequestContext(api.SearchProject))
 
 	// Get all projects
-	router.GET("/:profile/departments", WithRequestContext(api.GetDepartment))
+	router.GET("/profiles/:profile/departments", WithRequestContext(api.GetDepartment))
 
 	// Modify manager
-	router.PUT("/:profile/departments/:department", WithRequestContext(api.ModifyManager))
+	router.PUT("/profiles/:profile/departments/:department", WithRequestContext(api.ModifyManager))
 
 	return router
 }
@@ -140,8 +140,8 @@ func WithRequestContext(
 		reqID, _ := uuid.NewV4()
 
 		// Estrai token e sessione
-		token := r.Header.Get("Authorization")
-		sessionStr := r.Header.Get("X-Session")
+		token := r.Header.Get("Token")
+		sessionStr := r.Header.Get("Session")
 		session := 0
 		if parsedSession, err := strconv.Atoi(sessionStr); err == nil {
 			session = parsedSession
