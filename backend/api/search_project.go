@@ -13,7 +13,7 @@ import (
 	database "github.com/Mattia35/badServer/backend/database"
 )
 
-func searchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
+func SearchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
 
 	// Ottieni la sessione dell'utente
 	session := ctx.Session

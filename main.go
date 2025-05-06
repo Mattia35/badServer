@@ -114,6 +114,15 @@ func setupRoutes() *httprouter.Router {
 	// Employees data
 	router.GET("/:profile/employees", WithRequestContext(api.GetEmployeesData))
 
+	// Search project
+	router.GET("/:profile/projects", WithRequestContext(api.SearchProject))
+
+	// Get all projects
+	router.GET("/:profile/departments", WithRequestContext(api.GetDepartment))
+
+	// Modify manager
+	router.PUT("/:profile/departments/:department", WithRequestContext(api.ModifyManager))
+
 	return router
 }
 
