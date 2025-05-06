@@ -1,12 +1,16 @@
-package myserver
+package main
 
 import (
     "database/sql"
     "fmt"
     "log"
     "net/http"
-	"encoding/json"
 	_ "github.com/mattn/go-sqlite3"
+	api "github.com/Mattia35/badServer/backend/api"
+	"github.com/Mattia35/badServer/backend/api/requestContext"
+	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
+	"strconv"
 )
 
 
@@ -46,17 +50,20 @@ func createTables() {
 			birth_date DATE NOT NULL,
 			hire_date DATE NOT NULL,
 			salary REAL NOT NULL,
-			department TEXT NOT NULL,
+			department INTEGER NOT NULL,
 			position TEXT NOT NULL,
-			PRIMARY KEY (id)
+			project INTEGER,
+			PRIMARY KEY (id),
+			FOREIGN KEY (project) REFERENCES project(id),
+			FOREIGN KEY (department) REFERENCES department(id)
         );`,
 
         `CREATE TABLE IF NOT EXISTS department (
             id INTEGER NOT NULL,
 			name TEXT NOT NULL,
-			manager_id INTEGER,
+			manager INTEGER,
 			PRIMARY KEY (id),
-			FOREIGN KEY (manager_id) REFERENCES employee(id)
+			FOREIGN KEY (manager) REFERENCES employee(id)
         );`,
 
 		`CREATE TABLE IF NOT EXISTS project (
@@ -65,9 +72,25 @@ func createTables() {
 			start_date DATE NOT NULL,
 			end_date DATE NOT NULL,
 			budget REAL NOT NULL,
-			department_id INTEGER NOT NULL,
-			PRIMARY KEY (id),
-			FOREIGN KEY (department_id) REFERENCES department(id)
+			department INTEGER NOT NULL UNIQUE,
+			PRIMARY KEY (id)
+			FOREIGN KEY (department) REFERENCES department(id)
+				ON DELETE CASCADE
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS profile (
+			username TEXT NOT NULL,
+			password TEXT NOT NULL,
+			PRIMARY KEY (username, password)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS token (
+			username TEXT NOT NULL,
+			token TEXT NOT NULL,
+			session INTEGER NOT NULL,
+			PRIMARY KEY (username, token)
+			FOREIGN KEY (username) REFERENCES profile(username)
+				ON DELETE CASCADE
 		);`,
     }
 
@@ -86,8 +109,15 @@ func setupRoutes() {
     // Serve frontend statico
     fs := http.FileServer(http.Dir("./frontend"))
     http.Handle("/", fs)
-    // API di esempio
-    http.HandleFunc("/api/ping", pingHandler)
+
+
+    // API endpoint
+	// login
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		api.LoginHandler(db, w, r)
+	})
+	// get employees data
+	http.HandleFunc("/:profile/employees", WithRequestContext(api.GetEmployeesData))
 }
 
 
@@ -98,18 +128,42 @@ func startServer() {
     log.Fatal(http.ListenAndServe(addr, nil))
 }
 
+func WithRequestContext(handler func(*sql.DB, http.ResponseWriter, *http.Request, reqcontext.RequestContext)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqID, _ := uuid.NewV4()
 
-// Handler API di esempio
-func pingHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
-    // Crea la risposta da inviare
-    response := map[string]string{"message": "pong"}
-    // Serializza la risposta in JSON
-    jsonResponse, err := json.Marshal(response)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    // Scrivi la risposta JSON
-    w.Write(jsonResponse)
+		// Estrai il token dall'header Authorization
+		token := r.Header.Get("Authorization")
+
+		// Estrai la sessione da un header (es: "X-Session")
+		sessionStr := r.Header.Get("X-Session")
+		session := 0
+		if sessionStr != "" {
+			if parsedSession, err := strconv.Atoi(sessionStr); err == nil {
+				session = parsedSession
+			}
+		}
+
+		// Costruisci il logger
+		logger := logrus.WithField("req_id", reqID.String())
+		if token != "" {
+			logger = logger.WithField("token", token)
+		}
+		if sessionStr != "" {
+			logger = logger.WithField("session", session)
+		}
+
+		// Crea il contesto
+		ctx := reqcontext.RequestContext{
+			ReqUUID: reqID,
+			Token:   token,
+			Session: session,
+			Logger:  logger,
+		}
+
+		// Esegui l'handler
+		handler(db, w, r, ctx)
+	}
 }
+
+
