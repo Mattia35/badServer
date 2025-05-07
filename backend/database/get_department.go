@@ -7,7 +7,7 @@ import (
 
 func GetDepartment(db *sql.DB) ([]structions.Department, error) {
 	var departments []structions.Department
-	rows, err := db.Query(`SELECT id, name, manager FROM department`)
+	rows, err := db.Query(`SELECT id, name, COALESCE(manager, 0) FROM department`)
 	if err != nil {
 		return nil, err
 	}

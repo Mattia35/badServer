@@ -41,9 +41,14 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 		return
 	}
 
+	// Struct per la richiesta di modifica del manager
+	type ModifyManagerRequest struct {
+		NewManager int `json:"manager"`
+	}
+
 	// Ottieni il dipartimento dalla richiesta
-	var newManager int
-	err = json.NewDecoder(r.Body).Decode(&newManager)
+	var req ModifyManagerRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Bad request: isn't possible to decode department: " + err.Error(), http.StatusBadRequest)
 		return
@@ -56,7 +61,7 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	}
 
 	// Modifica il manager del dipartimento nel database
-	err = database.ModifyManager(db, newManager, nameDepartment)
+	err = database.ModifyManager(db, req.NewManager, nameDepartment)
 	if err != nil {
 		http.Error(w, "Internal server error: isn't possible to modify manager: " + err.Error(), http.StatusInternalServerError)
 		return
