@@ -26,7 +26,7 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	// Controlla che la sessione sia valida
 	control, err := database.CheckSession(db, session, token)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to check session", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to check session: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !control {
@@ -45,7 +45,7 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	var newManager int
 	err = json.NewDecoder(r.Body).Decode(&newManager)
 	if err != nil {
-		http.Error(w, "Bad request: isn't possible to decode department", http.StatusBadRequest)
+		http.Error(w, "Bad request: isn't possible to decode department: " + err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -58,7 +58,7 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	// Modifica il manager del dipartimento nel database
 	err = database.ModifyManager(db, newManager, nameDepartment)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to modify manager", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to modify manager: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -67,7 +67,7 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	// Scrivi la risposta di successo
 	response := map[string]string{"message": "Manager modified successfully"}
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Internal server error: isn't possible to encode response", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to encode response: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 

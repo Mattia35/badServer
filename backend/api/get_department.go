@@ -27,7 +27,7 @@ func GetDepartment(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	// Controlla che la sessione sia valida
 	control, err := database.CheckSession(db, session, token)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to check session", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to check session: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !control {
@@ -38,7 +38,7 @@ func GetDepartment(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	// Ottieni il dipartimento dal database
 	departments, err := database.GetDepartment(db)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to get department", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to get department: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -47,7 +47,7 @@ func GetDepartment(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 
 	// Scrivi la lista dei dipartimanti nella risposta
 	if err := json.NewEncoder(w).Encode(departments); err != nil {
-		http.Error(w, "Internal server error: isn't possible to encode list of departments", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to encode list of departments: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 

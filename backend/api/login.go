@@ -24,7 +24,7 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Decodifica la richiesta JSON
 	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		http.Error(w, "Invalid request: " + err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -54,14 +54,14 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprou
 	// Crea un token di autorizzazione
 	token, err := GenerateSecureToken(32)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to generate the token", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to generate the token: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Salva nel db il token generato
 	session, err := database.SaveToken(db, loginRequest.Username, token)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to save the token", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to save the token: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -73,7 +73,7 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprou
 	// Encode the AuthUser object in JSON and send it to the client.
 	w.Header().Set("content-type", "application/json")
 	if err := json.NewEncoder(w).Encode(authUser); err != nil {
-		http.Error(w, "Internal server error: ins't possible to encode the token", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: ins't possible to encode the token: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

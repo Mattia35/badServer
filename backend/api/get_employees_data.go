@@ -28,7 +28,7 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 	// Controlla che la sessione sia valida
 	control, err := database.CheckSession(db, session, token)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to check session", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to check session: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !control {
@@ -46,7 +46,7 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 	// Ottieni i dati degli impiegati dal database
 	employees, err := database.GetEmployeesData(db, query)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to get employees data"+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to get employees data: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -55,7 +55,7 @@ func GetEmployeesData(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx re
 
 	// Scrivi i dati degli impiegati nella risposta
 	if err := json.NewEncoder(w).Encode(employees); err != nil {
-		http.Error(w, "Internal server error: isn't possible to encode employees data", http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to encode employees data: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
