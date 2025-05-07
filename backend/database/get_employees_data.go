@@ -10,7 +10,7 @@ import (
 func GetEmployeesData(db *sql.DB, name_and_surname string) ([]structions.Employee, error) {
 	Employees := []structions.Employee{}
 	// Ottieni i dati dell'impiegato
-	query := `SELECT name_surname, email, phone, department, position, project FROM employee WHERE name_surname LIKE '` + name_and_surname + `%'`
+	query := `SELECT name_surname, email, phone, department, position, COALESCE(project, 0) FROM employee WHERE name_surname LIKE '` + name_and_surname + `%'`
 	rows, err := db.Query(query)
 	if err != nil {
 		if err == sql.ErrNoRows {
