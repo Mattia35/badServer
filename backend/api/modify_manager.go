@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
-	structions "github.com/Mattia35/badServer/backend/api/structs"
 	database "github.com/Mattia35/badServer/backend/database"
 	"github.com/julienschmidt/httprouter"
 )
@@ -37,15 +35,14 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	}
 
 	// ottieni il dipartimento dall'URL
-	var department structions.Department
-	department.ID, err = strconv.Atoi(ps.ByName("department"))
-	if err != nil {
+	nameDepartment := ps.ByName("department")
+	if nameDepartment == "" {
 		http.Error(w, "Can't get the department from URL", http.StatusBadRequest)
 		return
 	}
 
 	// Ottieni il dipartimento dalla richiesta
-	var newManager string
+	var newManager int
 	err = json.NewDecoder(r.Body).Decode(&newManager)
 	if err != nil {
 		http.Error(w, "Bad request: isn't possible to decode department", http.StatusBadRequest)
@@ -53,13 +50,13 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	}
 
 	// Controlla se il dipartimento è valido
-	if department.Name == "" {
+	if nameDepartment == "" {
 		http.Error(w, "Bad request: isn't possible to get the input", http.StatusBadRequest)
 		return
 	}
 
 	// Modifica il manager del dipartimento nel database
-	err = database.ModifyManager(db, newManager, department)
+	err = database.ModifyManager(db, newManager, nameDepartment)
 	if err != nil {
 		http.Error(w, "Internal server error: isn't possible to modify manager", http.StatusInternalServerError)
 		return

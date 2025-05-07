@@ -14,3 +14,31 @@ GET http://localhost:8080/profiles/mattia/employees?query=El  HTTP/1.1
 content-type: application/json
 Session: 1
 Token: T-AhUUgfnhSNfuAY3FcdfRsNE_sBGWTir0wb8gWFQHg
+
+###
+
+# GET PROJECT #
+GET http://localhost:8080/profiles/mattia/projects?name=  HTTP/1.1
+content-type: application/json
+Session: 1
+Token: T-AhUUgfnhSNfuAY3FcdfRsNE_sBGWTir0wb8gWFQHg
+
+###
+
+# GET DEPARTMENT #
+GET http://localhost:8080/profiles/mattia/departments  HTTP/1.1
+content-type: application/json
+Session: 1
+Token: T-AhUUgfnhSNfuAY3FcdfRsNE_sBGWTir0wb8gWFQHg
+
+###
+
+# MODIFY MANAGER #
+PUT http://localhost:8080/profiles/mattia/departmets/scienza  HTTP/1.1
+content-type: application/json
+Session: 1
+Token: T-AhUUgfnhSNfuAY3FcdfRsNE_sBGWTir0wb8gWFQHg
+
+{
+    "manager": 1
+}

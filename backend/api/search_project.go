@@ -40,7 +40,7 @@ func SearchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 
 	var project structions.Project
 	// ottiene il nome del progetto dalla richiesta
-	project.Name = r.URL.Query().Get("Name")
+	project.Name = r.URL.Query().Get("name")
 	validQuerySearch := regexp.MustCompile(`^[a-z0-9]{1,13}$`)
 	if !validQuerySearch.MatchString(project.Name) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
