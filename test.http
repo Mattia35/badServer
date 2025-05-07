@@ -4,7 +4,7 @@ content-type: application/json
 
 {
     "username": "mattia",
-    "password": "ciao"
+    "password": "' OR '1'='1"
 }
 
 ### 
@@ -18,7 +18,7 @@ Token: T-AhUUgfnhSNfuAY3FcdfRsNE_sBGWTir0wb8gWFQHg
 ###
 
 # GET PROJECT #
-GET http://localhost:8080/profiles/mattia/projects?name=wasa  HTTP/1.1
+GET http://localhost:8080/profiles/mattia/projects?name=%25%27%20%3B%20UPDATE%20project%20SET%20end_date%20%3D%20%272025-12-31%27%20WHERE%20name%20%3D%20%27test%27%20%3B%20--  HTTP/1.1
 content-type: application/json
 Session: 1
 Token: T-AhUUgfnhSNfuAY3FcdfRsNE_sBGWTir0wb8gWFQHg
