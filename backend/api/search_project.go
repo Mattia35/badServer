@@ -54,20 +54,22 @@ func SearchProject(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 	}
 
 	type TotalProj struct {
-		Project  []structions.Project `json:"project"`
-		Employee []string             `json:"employees"`
+		Project  structions.Project `json:"project"`
+		Employee []string           `json:"employees"`
 	}
-	var response TotalProj
-	response.Project = listProject
+	var response []TotalProj
 	// per ogni progetto ottiene l'elenco di utenti che ne fanno parte
 	for i := 0; i < len(listProject); i++ {
+		var project TotalProj
+		project.Project = listProject[i]
 		// ottieni i dati degli utenti che fanno parte del progetto
 		employee, err := database.GetEmplByProj(db, listProject[i].ID)
 		if err != nil {
 			http.Error(w, "Internal server error: isn't possible to get employee from project: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		response.Employee = append(response.Employee, employee)
+		project.Employee = employee
+		response = append(response, project)
 	}
 
 	// Imposta l'intestazione della risposta come JSON

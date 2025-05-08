@@ -11,7 +11,7 @@ import (
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,68 +27,83 @@ func main() {
 // Inizializza la connessione al database e crea tabelle
 func initDB() {
 	var err error
-	db, err = sql.Open("sqlite3", "./app.db")
+	dsn := "baduser:badpass@tcp(127.0.0.1:3306)/badserver?parseTime=true&multiStatements=true"
+	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal("Errore apertura database:", err)
 	}
 
-	// Crea le tabelle se non esistono
+	// Test connessione
+	if err := db.Ping(); err != nil {
+		log.Fatal("Errore connessione al database:", err)
+	}
+
 	createTables()
 }
 
-// Crea le tabelle necessarie
 func createTables() {
+	drops := []string{
+		"SET FOREIGN_KEY_CHECKS = 0;",
+		"DROP TABLE IF EXISTS token;",
+		"DROP TABLE IF EXISTS profile;",
+		"DROP TABLE IF EXISTS employee;",
+		"DROP TABLE IF EXISTS project;",
+		"DROP TABLE IF EXISTS department;",
+		"SET FOREIGN_KEY_CHECKS = 1;",
+	}
+	for _, stmt := range drops {
+		_, err := db.Exec(stmt)
+		if err != nil {
+			log.Fatal("Errore durante DROP:", err)
+		}
+	}
+
+	// Creazione tabelle
 	queries := []string{
-		`CREATE TABLE IF NOT EXISTS employee (
-            id INTEGER NOT NULL,
-            name_surname TEXT NOT NULL,
-			email TEXT NOT NULL UNIQUE,
-			phone TEXT NOT NULL UNIQUE,
-			address TEXT NOT NULL,
-			birth_date DATE NOT NULL,
-			hire_date DATE NOT NULL,
-			salary REAL NOT NULL,
-			department INTEGER NOT NULL,
-			position TEXT NOT NULL,
-			project INTEGER,
-			PRIMARY KEY (id),
-			FOREIGN KEY (project) REFERENCES project(id),
-			FOREIGN KEY (department) REFERENCES department(id)
-        );`,
-
-		`CREATE TABLE IF NOT EXISTS department (
-            id INTEGER NOT NULL,
-			name TEXT NOT NULL,
-			manager INTEGER,
-			PRIMARY KEY (id),
-			FOREIGN KEY (manager) REFERENCES employee(id)
-        );`,
-
-		`CREATE TABLE IF NOT EXISTS project (
-			id INTEGER NOT NULL,
-			name TEXT NOT NULL,
+		`CREATE TABLE department (
+			id INT NOT NULL,
+			name VARCHAR(100) NOT NULL,
+			manager INT,
+			address VARCHAR(255) NOT NULL,
+			PRIMARY KEY (id)
+		);`,
+		`CREATE TABLE project (
+			id INT NOT NULL,
+			name VARCHAR(100) NOT NULL,
 			start_date DATE NOT NULL,
 			end_date DATE NOT NULL,
-			budget REAL NOT NULL,
-			department INTEGER NOT NULL UNIQUE,
-			PRIMARY KEY (id)
-			FOREIGN KEY (department) REFERENCES department(id)
-				ON DELETE CASCADE
+			budget FLOAT NOT NULL,
+			department INT NOT NULL UNIQUE,
+			PRIMARY KEY (id),
+			CONSTRAINT fk_project_department FOREIGN KEY (department) REFERENCES department(id) ON DELETE CASCADE
 		);`,
-
-		`CREATE TABLE IF NOT EXISTS profile (
-			username TEXT NOT NULL,
-			password TEXT NOT NULL,
+		`CREATE TABLE employee (
+			id INT NOT NULL,
+			name_surname VARCHAR(255) NOT NULL,
+			email VARCHAR(255) NOT NULL UNIQUE,
+			phone VARCHAR(20) NOT NULL UNIQUE,
+			address VARCHAR(255) NOT NULL,
+			birth_date DATE NOT NULL,
+			hire_date DATE NOT NULL,
+			salary FLOAT NOT NULL,
+			department INT NOT NULL,
+			position VARCHAR(100) NOT NULL,
+			project INT,
+			PRIMARY KEY (id),
+			CONSTRAINT fk_employee_project FOREIGN KEY (project) REFERENCES project(id),
+			CONSTRAINT fk_employee_department FOREIGN KEY (department) REFERENCES department(id)
+		);`,
+		`CREATE TABLE profile (
+			username VARCHAR(100) NOT NULL,
+			password VARCHAR(255) NOT NULL,
 			PRIMARY KEY (username)
 		);`,
-
-		`CREATE TABLE IF NOT EXISTS token (
-			username TEXT NOT NULL,
-			token TEXT NOT NULL,
-			session INTEGER NOT NULL,
-			PRIMARY KEY (username, token)
-			FOREIGN KEY (username) REFERENCES profile(username)
-				ON DELETE CASCADE
+		`CREATE TABLE token (
+			username VARCHAR(100) NOT NULL,
+			token VARCHAR(255) NOT NULL,
+			session INT NOT NULL,
+			PRIMARY KEY (username, token),
+			FOREIGN KEY (username) REFERENCES profile(username) ON DELETE CASCADE
 		);`,
 	}
 
@@ -98,7 +113,16 @@ func createTables() {
 			log.Fatal("Errore creazione tabella:", err)
 		}
 	}
+
+	// Aggiungi foreign key ciclica dopo la creazione di tutte le tabelle
+	_, err := db.Exec(`ALTER TABLE department
+		ADD CONSTRAINT fk_department_manager FOREIGN KEY (manager) REFERENCES employee(id);`)
+	if err != nil {
+		log.Fatal("Errore aggiunta FK manager:", err)
+	}
 }
+
+
 
 func setupRoutes() *httprouter.Router {
 	router := httprouter.New()
@@ -121,7 +145,7 @@ func setupRoutes() *httprouter.Router {
 	router.GET("/profiles/:profile/departments", WithRequestContext(api.GetDepartment))
 
 	// Modify manager
-	router.PUT("/profiles/:profile/departments/:department", WithRequestContext(api.ModifyManager))
+	router.PUT("/profiles/:profile/departments/:department", WithRequestContext(api.ModifyDepAddress))
 
 	return router
 }

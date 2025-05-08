@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
+func ModifyDepAddress(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqcontext.RequestContext, ps httprouter.Params) {
 	// Ottieni la sessione dell'utente
 	session := ctx.Session
 
@@ -41,13 +41,13 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 		return
 	}
 
-	// Struct per la richiesta di modifica del manager
-	type ModifyManagerRequest struct {
-		NewManager int `json:"manager"`
+	// Struct per la richiesta di modifica della sede
+	type ModifyAddrRequest struct {
+		NewAddr string `json:"address"`
 	}
 
 	// Ottieni il dipartimento dalla richiesta
-	var req ModifyManagerRequest
+	var req ModifyAddrRequest
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Bad request: isn't possible to decode department: " + err.Error(), http.StatusBadRequest)
@@ -60,17 +60,17 @@ func ModifyManager(db *sql.DB, w http.ResponseWriter, r *http.Request, ctx reqco
 		return
 	}
 
-	// Modifica il manager del dipartimento nel database
-	err = database.ModifyManager(db, req.NewManager, nameDepartment)
+	// Modifica la sede del dipartimento nel database
+	err = database.ModifyDepAddress(db, req.NewAddr, nameDepartment)
 	if err != nil {
-		http.Error(w, "Internal server error: isn't possible to modify manager: " + err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal server error: isn't possible to modify address: " + err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Imposta l'intestazione della risposta come JSON
 	w.Header().Set("Content-Type", "application/json")
 	// Scrivi la risposta di successo
-	response := map[string]string{"message": "Manager modified successfully"}
+	response := map[string]string{"message": "Address modified successfully"}
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Internal server error: isn't possible to encode response: " + err.Error(), http.StatusInternalServerError)
 		return

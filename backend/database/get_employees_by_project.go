@@ -2,20 +2,33 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"strconv"
 )
 
-func GetEmplByProj(db *sql.DB, progectId int) (string, error) {
+func GetEmplByProj(db *sql.DB, progectId int) ([]string, error) {
 	// Ottieni il nome dell'impiegato
 	query := `SELECT name_surname FROM employee WHERE project = '` + strconv.Itoa(progectId) + `'`
-	var employee string
-	err := db.QueryRow(query).Scan(&employee)
+	var employees []string
+	rows, err := db.Query(query)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", errors.New("nessun impiegato trovato con questo progetto")
+			return employees, nil
 		}
-		return "", err
+		return nil, err
 	}
-	return employee, nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var employee string
+		err := rows.Scan(&employee)
+		if err != nil {
+			return nil, err
+		}
+		employees = append(employees, employee)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return employees, nil
 }
