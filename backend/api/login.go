@@ -34,7 +34,7 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Confronta le credenziali con quelle nel database
-	err := database.CheckCredentials(db, loginRequest.Username, loginRequest.Password)
+	username, err := database.CheckCredentials(db, loginRequest.Username, loginRequest.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
@@ -66,7 +66,7 @@ func LoginHandler(db *sql.DB, w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	var authUser AuthUser
-	authUser.Username = loginRequest.Username
+	authUser.Username = username
 	authUser.Token = token
 	authUser.Session = session
 
