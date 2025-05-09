@@ -24,6 +24,24 @@ func main() {
 	startServer(router)
 }
 
+func enableCORS(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Consenti richieste da qualsiasi origine (oppure specifica: http://localhost:5173)
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Token, Session")
+
+		// Rispondi immediatamente a richieste OPTIONS (preflight)
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
+}
+
+
 // Inizializza la connessione al database e crea tabelle
 func initDB() {
 	var err error
@@ -99,7 +117,7 @@ func createTables() {
 			PRIMARY KEY (username)
 		);`,
 		`CREATE TABLE token (
-			username VARCHAR(100) UNIQUE NOT NULL,
+			username VARCHAR(100) NOT NULL,
 			token VARCHAR(255) NOT NULL,
 			session INT NOT NULL,
 			PRIMARY KEY (username, token),
@@ -154,7 +172,7 @@ func setupRoutes() *httprouter.Router {
 func startServer(router *httprouter.Router) {
 	addr := "localhost:8080"
 	fmt.Println("Server avviato su", addr)
-	log.Fatal(http.ListenAndServe(addr, router))
+	log.Fatal(http.ListenAndServe(addr, enableCORS(router)))
 }
 
 func WithRequestContext(
