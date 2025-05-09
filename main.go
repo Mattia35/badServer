@@ -99,7 +99,7 @@ func createTables() {
 			PRIMARY KEY (username)
 		);`,
 		`CREATE TABLE token (
-			username VARCHAR(100) NOT NULL,
+			username VARCHAR(100) UNIQUE NOT NULL,
 			token VARCHAR(255) NOT NULL,
 			session INT NOT NULL,
 			PRIMARY KEY (username, token),
