@@ -40,23 +40,19 @@ export default{
 <template>
     <div class="container">
       <div v-if="errormsg" class="error">{{ errormsg }}</div>
-  
       <div class="card" @click="goToEmployees">
-        <div class="card-content">
-          <h2>Employees</h2>
-        </div>
+            <img src="/icons8-sfondo-conferenza-selezionato-100.png" alt="Employees" />
+            <h2 class="button-text">Employees</h2>
       </div>
   
       <div class="card" @click="goToProjects">
-        <div class="card-content">
-          <h2>Projects</h2>
-        </div>
+            <img src="/icons8-requisiti-100.png" alt="projects" />
+            <h2 class="button-text">Projects</h2>
       </div>
   
       <div class="card" @click="goToDepartments">
-        <div class="card-content">
-          <h2>Departments</h2>
-        </div>
+            <img src="/icons8-dipartimento-96.png" alt="Departments" />
+            <h2 class="button-text">Departments</h2>
       </div>
     </div>
   </template>
@@ -65,33 +61,38 @@ export default{
 .container {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    align-items: center;        
+    justify-content: center;
     padding: 20px;
-    width: 1200px;
-    flex-wrap: wrap;
+    width: 100%;                
+    max-width: 1500px;
+    height: 100%;           
+    margin: 0 auto;             
 }
 
 .card {
     display: flex;
+    flex-direction: row;
     align-items: center;
     background-color: #f5f5f5;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
+    max-width: 1400px;
     padding: 15px;
-    margin: 10px;
+    margin: 10px 0;
     cursor: pointer;
     transition: transform 0.2s;
+    height: 200px;
 }
 
 .card:hover {
     transform: scale(1.03);
 }
 
-.card-image {
-    width: 60px;
-    height: 60px;
-    margin-right: 15px;
+.card img {
+    
+    margin: 30px;
 }
 
 .card-content {
@@ -117,5 +118,11 @@ export default{
     margin-bottom: 10px;
     width: 100%;
     text-align: center;
+}
+
+.button-text {
+    font-size: 35px;
+    font-weight: bold;
+    margin-left: 10px;
 }
 </style>

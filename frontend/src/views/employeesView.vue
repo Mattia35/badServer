@@ -49,10 +49,15 @@ export default {
 
 <style>
 .employees-container {
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 20px 0; 
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;        
+  justify-content: flex-start; 
+  height: 100%;
 }
+
 
 .title {
     font-size: 32px;
@@ -107,4 +112,5 @@ export default {
     text-align: center;
     margin-top: 10px;
 }
+
 </style>

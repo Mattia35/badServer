@@ -37,27 +37,27 @@ export default{
 </script>
 
 <template>
-    <div class = "login-container">
-        <ErrorMsg v-if="errormsg" :msg="errormsg"></Errormsg>
-        <form @submit.prevent="login">
-            <h1>Login</h1>
-            <div class="input-container">
-                <input type="text" v-model="username" placeholder="Write your username">
-                <input type="text" v-model="password" placeholder="Write your password">
-                <button type="submit">Login</button>
-            </div>
-        </form>
+    <div class="body">
+        <div class = "login-container">
+            <ErrorMsg v-if="errormsg" :msg="errormsg"></Errormsg>
+            <form @submit.prevent="login">
+                <h1>Login</h1>
+                <div class="input-container">
+                    <input type="text" v-model="username" placeholder="Write your username">
+                    <input type="text" v-model="password" placeholder="Write your password">
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
 <style>
     .body {
-        font-family: Arial, sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
-        background-color: #f4f4f4;
         margin: 0;
     }
 
@@ -67,6 +67,7 @@ export default{
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
         width: 500px;
+        height: 200px;
         text-align: center;
     }
 
