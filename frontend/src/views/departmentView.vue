@@ -14,7 +14,7 @@ export default {
     },
     methods: {
         async getDepartments() {
-            this.errormsg = "";
+            this.errormsg = "";         
             try {
                 let response = await this.$axios.get(
                     `profiles/${sessionStorage.username}/departments`,
@@ -27,6 +27,10 @@ export default {
         },
         async modifyAddress(){
             this.errormsg = "";
+            if (this.newAddress.length === 0) {
+                this.errormsg = "Please enter a new address";
+                return;
+            }
             try {
                 let response = await this.$axios.put(
                     `profiles/${sessionStorage.username}/departments/${this.selectedDepartment}`,
@@ -45,12 +49,21 @@ export default {
             this.isShow = !this.isShow;
             this.selectedDepartment = department;
         },
+
+        closeModify(){
+            if (this.isShow) {
+                this.errormsg = "";
+                this.isShow = false;
+                this.newAddress = "";
+                this.selectedDepartment = "";
+            }
+        }
     },
 }
 </script>
 
 <template>
-    <div class="department-conteiner">
+    <div class="department-conteiner" @click="closeModify">
         <h1 class="title">Departments</h1>
         <hr class="divider" />
 
@@ -68,8 +81,8 @@ export default {
                     <p><strong>Address:</strong> {{ department.address }}</p>
                 </div>
 
-                <div class="button-container">
-                    <div v-if="isShow">
+                <div @click.stop class="button-container">
+                    <div class="change-addr" v-if="isShow">
                         <input
                             v-model="newAddress"
                             type="text"
@@ -145,7 +158,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    height: 35px;
     padding-left: 20px;
 }
 
@@ -167,6 +180,8 @@ export default {
     color: white;
     font-size: 16px;
     cursor: pointer;
+    max-width: 150px;
+    min-width: 150px;
     transition: background-color 0.2s ease;
 }
 
@@ -174,6 +189,14 @@ export default {
     color: red;
     text-align: center;
     margin-top: 10px;
+}
+
+.change-addr {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 500px;
+    max-height: 35px;
 }
 
 </style>

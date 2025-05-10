@@ -40,8 +40,8 @@ export default{
     <div class="body">
         <div class = "login-container">
             <ErrorMsg v-if="errormsg" :msg="errormsg"></Errormsg>
-            <form @submit.prevent="login">
-                <h1>Login</h1>
+            <form class="form" @submit.prevent="login">
+                <h1>Bad server</h1>
                 <div class="input-container">
                     <input type="text" v-model="username" placeholder="Write your username">
                     <input type="text" v-model="password" placeholder="Write your password">
@@ -71,6 +71,12 @@ export default{
         text-align: center;
     }
 
+    .form h1 {
+        margin-top: 0;
+        font-size: 24px;
+        color: #333;
+    }
+
     .input-container {
         position: relative;
         margin-top: 20px;
@@ -83,6 +89,7 @@ export default{
         border: 1px solid #ccc;
         border-radius: 5px;
         outline: none;
+        margin-bottom: 10px;
     }
 
     .input-container label {

@@ -12,7 +12,7 @@ import LoginView from './views/loginView.vue'
 .app-container {
   display: flex;
   justify-content: center;
-  height: 100vh;
+  height: 90vh;
   background-color: white;
 }
 </style>

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	api "github.com/Mattia35/badServer/backend/api"
 	reqcontext "github.com/Mattia35/badServer/backend/api/requestContext"
@@ -60,6 +61,7 @@ func initDB() {
 }
 
 func createTables() {
+	/*
 	drops := []string{
 		"SET FOREIGN_KEY_CHECKS = 0;",
 		"DROP TABLE IF EXISTS token;",
@@ -75,17 +77,18 @@ func createTables() {
 			log.Fatal("Errore durante DROP:", err)
 		}
 	}
+		*/
 
 	// Creazione tabelle
 	queries := []string{
-		`CREATE TABLE department (
+		`CREATE TABLE IF NOT EXISTS department (
 			id INT NOT NULL,
 			name VARCHAR(100) NOT NULL,
 			manager INT,
 			address VARCHAR(255) NOT NULL,
 			PRIMARY KEY (id)
 		);`,
-		`CREATE TABLE project (
+		`CREATE TABLE IF NOT EXISTS project (
 			id INT NOT NULL,
 			name VARCHAR(100) NOT NULL,
 			start_date DATE NOT NULL,
@@ -95,7 +98,7 @@ func createTables() {
 			PRIMARY KEY (id),
 			CONSTRAINT fk_project_department FOREIGN KEY (department) REFERENCES department(id) ON DELETE CASCADE
 		);`,
-		`CREATE TABLE employee (
+		`CREATE TABLE IF NOT EXISTS employee (
 			id INT NOT NULL,
 			name_surname VARCHAR(255) NOT NULL,
 			email VARCHAR(255) NOT NULL UNIQUE,
@@ -111,12 +114,12 @@ func createTables() {
 			CONSTRAINT fk_employee_project FOREIGN KEY (project) REFERENCES project(id),
 			CONSTRAINT fk_employee_department FOREIGN KEY (department) REFERENCES department(id)
 		);`,
-		`CREATE TABLE profile (
+		`CREATE TABLE IF NOT EXISTS profile (
 			username VARCHAR(100) NOT NULL,
 			password VARCHAR(255) NOT NULL,
 			PRIMARY KEY (username)
 		);`,
-		`CREATE TABLE token (
+		`CREATE TABLE IF NOT EXISTS token (
 			username VARCHAR(100) NOT NULL,
 			token VARCHAR(255) NOT NULL,
 			session INT NOT NULL,
@@ -136,7 +139,9 @@ func createTables() {
 	_, err := db.Exec(`ALTER TABLE department
 		ADD CONSTRAINT fk_department_manager FOREIGN KEY (manager) REFERENCES employee(id);`)
 	if err != nil {
-		log.Fatal("Errore aggiunta FK manager:", err)
+		if !strings.Contains(err.Error(), "errno: 121") {
+			log.Fatal("Errore aggiunta FK manager:", err)
+		}
 	}
 }
 
