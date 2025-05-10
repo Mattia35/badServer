@@ -94,7 +94,7 @@ Token: Dgr0WDvqTH6_eAYn_MO4WSuhpQiEqAxs9lFnE7xQ8IU
 PUT http://localhost:8080/profiles/mattia/departments/scienza  HTTP/1.1
 content-type: application/json
 Session: 1
-Token: Dgr0WDvqTH6_eAYn_MO4WSuhpQiEqAxs9lFnE7xQ8IU
+Token: yTthzxxodRwUtJjUE_SQiyznTrbjioZXveYX7zUDts0 	
 
 {
     "address": "aaa'; DELETE FROM token; -- "

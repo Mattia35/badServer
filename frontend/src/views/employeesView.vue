@@ -15,7 +15,6 @@ export default {
                 return;
             }
             try {
-                console.log(sessionStorage.session, sessionStorage.token);
                 let response = await this.$axios.get(
                     `profiles/${sessionStorage.username}/employees?query=${this.selectedEmployee}`,
                     { headers: { Session: sessionStorage.session, Token: sessionStorage.token } }
@@ -45,6 +44,20 @@ export default {
         </div>
     
         <div v-if="errormsg" class="error">{{ errormsg }}</div>
+
+        <div class="employees-list">
+            <div
+                v-for="employee in employees"
+                class="employee-box"
+            >
+                <h2 class="employee-title">{{ employee.name_surname }}</h2>
+                <p><strong>Email:</strong> {{ employee.email }}</p>
+                <p><strong>Phone:</strong> {{ employee.phone }}</p>
+                <p><strong>Department:</strong> {{ employee.department }}</p>
+                <p><strong>Position:</strong> {{ employee.position }}</p>
+                <p><strong>Project ID:</strong> {{ employee.project }}</p>
+            </div>
+        </div>
     </div>
 </template>  
 
@@ -110,6 +123,26 @@ export default {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+}
+
+.employee-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.employee-box {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.employee-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .error {

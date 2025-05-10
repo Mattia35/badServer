@@ -8,7 +8,7 @@ export default {
         };
     },
     methods: {
-        async getProject() {
+        async getProjects() {
             this.errormsg = "";
             if (this.selectedProject.length === 0) {
                 this.projects = [];
@@ -41,10 +41,27 @@ export default {
             placeholder="Search projects..."
             class="search-input"
             />
-            <button class="search-button" @click="getprojects">Search</button>
+            <button class="search-button" @click="getProjects">Search</button>
         </div>
     
         <div v-if="errormsg" class="error">{{ errormsg }}</div>
+
+        <div class="projects-list">
+            <div
+                v-for="project in projects"
+                class="project-box"
+            >
+                <h2 class="project-title">{{ project.project.name }}</h2>
+                <p><strong>ID:</strong> {{ project.project.id }}</p>
+                <p><strong>Start Date:</strong> {{ project.project.start_date }}</p>
+                <p><strong>End Date:</strong> {{ project.project.end_date }}</p>
+                <p><strong>Department:</strong> {{ project.project.department }}</p>
+                <p><strong>Employees:</strong></p>
+                <div v-for="employee in project.employees">
+                    <p>{{ employee }}</p>
+                </div>
+            </div>
+        </div>
     </div>
 </template>  
 
@@ -110,6 +127,26 @@ export default {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+}
+
+.projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.project-box {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.project-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .error {
