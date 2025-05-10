@@ -108,7 +108,7 @@ export default{
         width: 50%;
         padding: 10px;
         margin-top: 20px;
-        background: #2470dc;
+        background: #12B886;
         color: #fff;
         border: none;
         border-radius: 5px;

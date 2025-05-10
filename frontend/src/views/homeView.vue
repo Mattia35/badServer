@@ -41,17 +41,17 @@ export default{
     <div class="container">
       <div v-if="errormsg" class="error">{{ errormsg }}</div>
       <div class="card" @click="goToEmployees">
-            <img src="/icons8-sfondo-conferenza-selezionato-100.png" alt="Employees" />
+            <img src="/employees.png" alt="Employees" />
             <h2 class="button-text">Employees</h2>
       </div>
   
       <div class="card" @click="goToProjects">
-            <img src="/icons8-requisiti-100.png" alt="projects" />
+            <img src="/projects.png" alt="projects" />
             <h2 class="button-text">Projects</h2>
       </div>
   
       <div class="card" @click="goToDepartments">
-            <img src="/icons8-dipartimento-96.png" alt="Departments" />
+            <img src="/departments.png" alt="Departments" />
             <h2 class="button-text">Departments</h2>
       </div>
     </div>

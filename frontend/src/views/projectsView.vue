@@ -3,24 +3,24 @@ export default {
     data: function(){
         return{
             errormsg: null,
-            employees: [],
-            selectedEmployee: "",
+            projects: [],
+            selectedProject: "",
         };
     },
     methods: {
-        async getEmployees() {
+        async getProject() {
             this.errormsg = "";
-            if (this.selectedEmployee.length === 0) {
-                this.employees = [];
+            if (this.selectedProject.length === 0) {
+                this.projects = [];
                 return;
             }
             try {
                 console.log(sessionStorage.session, sessionStorage.token);
                 let response = await this.$axios.get(
-                    `profiles/${sessionStorage.username}/employees?query=${this.selectedEmployee}`,
+                    `profiles/${sessionStorage.username}/projects?name=${this.selectedProject}`,
                     { headers: { Session: sessionStorage.session, Token: sessionStorage.token } }
                 );
-                this.employees = response.data || [];
+                this.projects = response.data || [];
             } catch (e) {
                 this.errormsg = e.toString();
             }
@@ -30,18 +30,18 @@ export default {
 </script>
 
 <template>
-    <div class="employees-container">
-        <h1 class="title">Employees</h1>
+    <div class="projects-container">
+        <h1 class="title">Projects</h1>
         <hr class="divider" />
   
         <div class="search-bar">
             <input
-            v-model="selectedEmployee"
+            v-model="selectedProject"
             type="text"
-            placeholder="Search employees..."
+            placeholder="Search projects..."
             class="search-input"
             />
-            <button class="search-button" @click="getEmployees">Search</button>
+            <button class="search-button" @click="getprojects">Search</button>
         </div>
     
         <div v-if="errormsg" class="error">{{ errormsg }}</div>
@@ -49,7 +49,7 @@ export default {
 </template>  
 
 <style>
-.employees-container {
+.projects-container {
     width: 100%;
     margin: 0 auto;
     padding: 0 20px;
