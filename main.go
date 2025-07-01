@@ -61,23 +61,6 @@ func initDB() {
 }
 
 func createTables() {
-	/*
-	drops := []string{
-		"SET FOREIGN_KEY_CHECKS = 0;",
-		"DROP TABLE IF EXISTS token;",
-		"DROP TABLE IF EXISTS profile;",
-		"DROP TABLE IF EXISTS employee;",
-		"DROP TABLE IF EXISTS project;",
-		"DROP TABLE IF EXISTS department;",
-		"SET FOREIGN_KEY_CHECKS = 1;",
-	}
-	for _, stmt := range drops {
-		_, err := db.Exec(stmt)
-		if err != nil {
-			log.Fatal("Errore durante DROP:", err)
-		}
-	}
-		*/
 
 	// Creazione tabelle
 	queries := []string{
