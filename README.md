@@ -75,15 +75,35 @@ Ensure the following components are installed on your system:
 * A Unix-like operating system or Windows with WSL
 
 ### Database Setup
-Before running the application, a database server compatible with MySQL (e.g., MariaDB) must be installed and running locally. All components (client, backend server, and database server) operate on the same host, enabling full academic analysis of SQL Injection vulnerabilities in a controlled environment.
-Ensure MariaDB is installed and running on the local machine:
-```bash
-# Linux
-sudo systemctl start mariadb
 
-# macOS (Homebrew)
-brew services start mariadb
+The application is designed to run entirely on a single host for academic and experimental purposes. In this configuration, the client, the backend server, and the database server all execute on the same machine, while preserving a clear logical separation between components.
+
+The backend HTTP server is explicitly configured in main.go to listen on the local loopback interface at:
+```code
+localhost:8080
 ```
+The database server is a MySQL-compatible system (MariaDB) running locally on the same host and accessed via a TCP connection.
+
+### Database Server Requirements
+
+A local installation of MariaDB (MySQL-compatible) is required. During development and testing, the database server runs on the loopback interface and listens on the standard MySQL/MariaDB port.
+
+This setup ensures that:
+
+* no external network communication is involved
+* all database interactions can be inspected locally
+* the environment remains isolated and reproducible
+
+### Creating the Database and Dedicated User
+
+Database initialization is performed manually using the MariaDB client, which acts as a command-line interface to the local database server.
+
+Access the database client using an administrative account:
+
+```bash
+mysql -u root -p
+```
+Once connected, execute the following SQL commands:
 ```sql
 CREATE DATABASE badserver;
 
@@ -123,10 +143,4 @@ Once the server is running, the backend services can be accessed through the fol
 ```
 http://localhost:8080
 ```
-
-## Ethical and Legal Disclaimer
-
-This software is provided **solely for educational and research purposes**.
-
-Any attempt to use the techniques demonstrated here against systems without explicit authorization may be illegal and unethical. The authors assume **no liability** for misuse of this code.
 
