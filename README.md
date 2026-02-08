@@ -4,13 +4,20 @@ Academic and educational project designed to study and experiment with SQL Injec
 ⚠️ **Security Notice**
 This repository contains **deliberately insecure code**. It is intended **exclusively for academic, educational, and research purposes** (e.g., university projects, cybersecurity laboratories, OWASP demonstrations). **Do not deploy this software in production environments or expose it to public networks.**
 
----
-
 ## Abstract
 
 **BadServer** is a client–server application implemented in **Go** with a **MySQL** backend, intentionally designed to violate common secure coding practices. The project provides a realistic environment for analyzing **SQL Injection vulnerabilities** in RESTful APIs, including the impact of unsafe query construction, missing input validation, and insecure database configuration options.
 
----
+## Possible Attacks
+
+This project is intentionally designed to support the study and practical experimentation of SQL Injection attack techniques. The backend implementation deliberately enables multiple classes of attacks by allowing user-controlled input to directly influence SQL query execution.
+
+In particular, the application supports the analysis of in-band SQL Injection attacks, including:
+* Tautology-based injections, where conditional statements are manipulated to always evaluate to true, enabling authentication bypass and unrestricted data access.
+* End-of-line comment injections, which exploit SQL comment syntax to truncate legitimate query logic and ignore security-relevant conditions.
+* Piggybacked queries, made possible by unsafe query concatenation and the explicit use of multi-statement execution, allowing attackers to append and execute additional malicious SQL commands.
+
+In addition to in-band techniques, the system is also suitable for studying inferential SQL Injection attacks (Illicit or unauthorized queries), where sensitive information is extracted indirectly through the application’s behavior rather than direct query output.
 
 ## System Architecture
 
@@ -36,8 +43,6 @@ Client (Browser / HTTP tools)
 * **Server**: REST API implemented in Go
 * **Database**: MySQL with automatically initialized schema
 
----
-
 ## Technology Stack
 
 * **Programming Language**: Go
@@ -47,132 +52,77 @@ Client (Browser / HTTP tools)
 * **Database Driver**: `github.com/go-sql-driver/mysql`
 * **Logging**: `github.com/sirupsen/logrus`
 
----
-
 ## Project Structure
 
 ```text
 badServer/
-├── backend/
-│   ├── api/                  # HTTP handlers (intentionally vulnerable)
-│   └── api/requestContext/   # Request-scoped context and logging
-│
+├── backend/                  # API layer and Database layer
 ├── frontend/                 # Static client files
 ├── main.go                   # Application entry point
 └── README.md
 ```
 
----
+## How to Run the Project
 
-## Database Configuration
+This section describes how to set up and run the application locally for educational and experimental purposes.
 
-The database connection is intentionally configured with insecure options:
+### Prerequisites
+
+Ensure the following components are installed on your system:
+
+* **Go** (version 1.20 or higher)
+* **MySQL** (version 8.x recommended)
+* A Unix-like operating system or Windows with WSL
+
+### Database Setup
+Before running the application, a database server compatible with MySQL (e.g., MariaDB) must be installed and running locally. All components (client, backend server, and database server) operate on the same host, enabling full academic analysis of SQL Injection vulnerabilities in a controlled environment.
+Ensure MariaDB is installed and running on the local machine:
+```bash
+# Linux
+sudo systemctl start mariadb
+
+# macOS (Homebrew)
+brew services start mariadb
+```
+```sql
+CREATE DATABASE badserver;
+
+CREATE USER 'baduser'@'localhost' IDENTIFIED BY 'badpass';
+GRANT ALL PRIVILEGES ON badserver.* TO 'baduser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+The application connects to the database using the following Data Source Name (DSN):
 
 ```go
 baduser:badpass@tcp(127.0.0.1:3306)/badserver?parseTime=true&multiStatements=true
 ```
 
-The parameter `multiStatements=true` is deliberately enabled to facilitate advanced SQL Injection scenarios.
+> **Note**: The `multiStatements=true` option is intentionally enabled to facilitate advanced SQL Injection scenarios.
 
-### Database Initialization
+### Application Startup
 
-The schema is created automatically at server startup and includes the following tables:
+Clone the repository and start the server:
 
-* `profile`
-* `token`
-* `department`
-* `project`
-* `employee`
-
-The schema uses **real foreign key constraints**, including cyclic dependencies, to enable complex attack scenarios.
-
----
-
-## API Endpoints
-
-### Authentication
-
-```
-PUT /login
+```bash
+git clone https://github.com/Mattia35/badServer.git
+cd badServer
+go run main.go
 ```
 
-Handles user authentication. The implementation intentionally lacks robust security mechanisms.
+On startup, the application will:
 
----
+1. Establish a connection to the MySQL database
+2. Automatically create the required tables
+3. Start the HTTP server on `localhost:8080`
 
-### Employee Data
+### Accessing the Application
 
-```
-GET /profiles/:profile/employees
-```
-
-Returns employee information associated with a profile.
-
-**Security note:** user-controlled parameters are directly interpolated into SQL queries.
-
----
-
-### Project Search
+Once the server is running, the backend services can be accessed through the following base URL:
 
 ```
-GET /profiles/:profile/projects
+http://localhost:8080
 ```
-
-Designed to support experimentation with:
-
-* Boolean-based SQL Injection
-* UNION-based SQL Injection
-* Error-based SQL Injection
-
----
-
-### Department Data
-
-```
-GET /profiles/:profile/departments
-```
-
-Retrieves department information.
-
----
-
-### Department Modification
-
-```
-PUT /profiles/:profile/departments/:department
-```
-
-Updates department data.
-
-**Critical endpoint:** suitable for demonstrating destructive SQL Injection attacks (`UPDATE`, `INSERT`, `DROP`).
-
----
-
-## Intended Vulnerabilities
-
-This project intentionally violates multiple secure coding principles:
-
-* Use of dynamic SQL built via string concatenation
-* Absence of prepared statements
-* Lack of input validation and sanitization
-* Hard-coded database credentials
-* Overly permissive CORS configuration
-* Weak authentication and session handling
-
-These weaknesses are introduced **by design** for educational analysis.
-
----
-
-## Educational Use Cases
-
-The repository can be used for:
-
-* University laboratory assignments
-* Secure coding and penetration testing courses
-* OWASP Top 10 demonstrations
-* Controlled Red Team / Blue Team exercises
-
----
 
 ## Ethical and Legal Disclaimer
 
@@ -180,19 +130,3 @@ This software is provided **solely for educational and research purposes**.
 
 Any attempt to use the techniques demonstrated here against systems without explicit authorization may be illegal and unethical. The authors assume **no liability** for misuse of this code.
 
----
-
-## Future Work
-
-Possible extensions include:
-
-* Secure refactoring using prepared statements
-* Side-by-side comparison between vulnerable and hardened implementations
-* Automated test cases for vulnerability detection
-* Integration into Capture The Flag (CTF) environments
-
----
-
-## License
-
-This project is intended for academic use. Add an explicit open-source license (e.g., MIT, Apache 2.0) if you plan to redistribute or extend it.
