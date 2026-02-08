@@ -1,8 +1,5 @@
 # BadServer
-
-## An Intentionally Vulnerable Client–Server Application for SQL Injection Analysis
-
-> **Academic and educational project** designed to study and experiment with SQL Injection vulnerabilities in a controlled environment.
+Academic and educational project designed to study and experiment with SQL Injection vulnerabilities in a controlled environment.
 
 ⚠️ **Security Notice**
 This repository contains **deliberately insecure code**. It is intended **exclusively for academic, educational, and research purposes** (e.g., university projects, cybersecurity laboratories, OWASP demonstrations). **Do not deploy this software in production environments or expose it to public networks.**
@@ -12,13 +9,6 @@ This repository contains **deliberately insecure code**. It is intended **exclus
 ## Abstract
 
 **BadServer** is a client–server application implemented in **Go** with a **MySQL** backend, intentionally designed to violate common secure coding practices. The project provides a realistic environment for analyzing **SQL Injection vulnerabilities** in RESTful APIs, including the impact of unsafe query construction, missing input validation, and insecure database configuration options.
-
-The goal is to support hands-on learning in courses related to:
-
-* Cybersecurity
-* Secure Software Engineering
-* Web Application Security
-* OWASP Top 10 vulnerabilities
 
 ---
 
